@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Organizador de Estudos</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f2f4f8;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .container {
+            background: white;
+            max-width: 500px;
+            margin: auto;
+            padding: 25px;
+            border-radius: 12px;
+        }
+
+        input {
+            padding: 12px;
+            width: 65%;
+        }
+
+        button {
+            padding: 12px;
+            cursor: pointer;
+            background: #3157a4;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+
+        li {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .concluida {
+            text-decoration: line-through;
+            color: gray;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>Meu Organizador de Estudos</h1>
+    <p>Organize suas tarefas e acompanhe seu progresso.</p>
+
+    <input id="tarefa" placeholder="Digite uma tarefa">
+    <button onclick="adicionar()">Adicionar</button>
+
+    <ul id="lista"></ul>
+</div>
+
+<script>
+    let tarefas = JSON.parse(
+        localStorage.getItem("tarefas")
+    ) || [];
+
+    function salvar() {
+        localStorage.setItem(
+            "tarefas",
+            JSON.stringify(tarefas)
+        );
+    }
+
+    function renderizar() {
+        const lista = document.getElementById("lista");
+        lista.innerHTML = "";
+
+        tarefas.forEach((tarefa, indice) => {
+            const item = document.createElement("li");
+
+            const texto = document.createElement("span");
+            texto.textContent = tarefa.nome;
+
+            if (tarefa.concluida) {
+                texto.classList.add("concluida");
+            }
+
+            texto.onclick = () => {
+                tarefas[indice].concluida =
+                    !tarefas[indice].concluida;
+                salvar();
+                renderizar();
+            };
+
+            const excluir = document.createElement("button");
+            excluir.textContent = "Excluir";
+
+            excluir.onclick = () => {
+                tarefas.splice(indice, 1);
+                salvar();
+                renderizar();
+            };
+
+            item.append(texto, excluir);
+            lista.appendChild(item);
+        });
+    }
+
+    function adicionar() {
+        const campo = document.getElementById("tarefa");
+        const nome = campo.value.trim();
+
+        if (nome === "") return;
+
+        tarefas.push({
+            nome: nome,
+            concluida: false
+        });
+
+        salvar();
+        renderizar();
+        campo.value = "";
+    }
+
+    renderizar();
+</script>
+
+</body>
+</html>
